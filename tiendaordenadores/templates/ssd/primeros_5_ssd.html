@@ -1,0 +1,19 @@
+{% extends "../estructura/templatefinal.html" %}
+
+{% comment %} ESTE ES EL SEGUNDO TEMPLATE TAG, FOR EMPTY {% endcomment %}
+{% block cabecera %}
+{% endblock %}
+
+{% block contenido %}
+    {% if not ssds %}
+        <p>No se encontraron SSDs disponibles.</p>
+    {% else %}
+        {% for ssd in ssds %}
+            {% include "../estructura/ssd_for.html" %}
+        {% empty %}
+            <p>No se encontraron SSDs disponibles.</p>  
+        {% endfor %}
+    {% endif %}
+{% endblock %}
+
+{% comment %} FIN DEL SEGUNDO TEMPLATE TAG {% endcomment %}

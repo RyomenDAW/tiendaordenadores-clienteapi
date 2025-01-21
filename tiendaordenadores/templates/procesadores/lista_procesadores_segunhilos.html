@@ -1,0 +1,15 @@
+{% extends "../estructura/templatefinal.html" %}
+{% block cabecera %}
+{% endblock %}
+    
+    <h1>Lista de Procesadores Segun sus Hilos</h1>
+    {% block contenido %}
+
+    {% for procesador in procesadores %}
+    {% include "../estructura/procesadores_for.html" %}
+
+    {% endfor %}
+    {% endblock %}
+
+</body>
+</html>

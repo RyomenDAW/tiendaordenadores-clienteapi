@@ -1,0 +1,17 @@
+{% extends "../estructura/templatefinal.html" %}
+{% block cabecera %}
+{% endblock %}
+    
+{% block contenido %}
+{% comment %} QUINTO TEMPLATE TAG, FOR, ENDFOR {% endcomment %}
+
+    {% for grafica in graficas %}
+    {% include "../estructura/graficas_for.html" %}
+
+    {% endfor %}
+{% comment %} FIN DEL QUINTO TEMPLATE TAG {% endcomment %}
+
+{% endblock %}
+
+</body>
+</html>
