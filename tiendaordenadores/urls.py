@@ -9,5 +9,7 @@ from django.contrib.auth import views as auth_views
 
 
 urlpatterns = [
-    path('template-api/procesador_list.html', views.procesadores_lista_api, name='procesadores_lista_api')
+    path('template-api/procesador_list.html', views.procesadores_lista_api, name='procesadores_lista_api'),
+    path('template-api/procesador_list_mejorado.html', views.procesadores_lista_mejorada_api, name='procesadores_lista_mejorada_api')
+
 ]

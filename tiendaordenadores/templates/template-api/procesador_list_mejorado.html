@@ -1,0 +1,52 @@
+{% extends "estructura/base_simple.html" %}
+{% block contenido %}
+
+    <h1 class="display-3 text-center mb-4">¡Lista de Procesadores!</h1>
+
+    <div class="row">
+        {% for procesador in procesadores_mostrar %}
+            <div class="col-sm-4 mb-4">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title text-primary"><strong>{{ procesador.nombre }}</strong></h5>
+
+                        <p><strong>ID:</strong> {{ procesador.id_procesador|default_if_none:"No disponible" }}</p>
+
+                        <p><strong>Familia del Procesador:</strong> {{ procesador.familiaprocesador|slice:":10" }}</p>
+
+                        <p><strong>Potencia de Cálculo:</strong> {{ procesador.potenciacalculo|default_if_none:"Información no disponible" }}</p>
+
+                        <p><strong>Núcleos:</strong> {{ procesador.nucleos|default_if_none:"No especificado" }}</p>
+
+                        <p><strong>Hilos:</strong> {{ procesador.hilos|default_if_none:"No especificado" }}</p>
+
+                        {% if procesador.imagen %}
+                            <img src="{{ procesador.imagen }}" alt="Imagen de {{ procesador.nombre }}" class="img-fluid rounded mb-2">
+                        {% else %}
+                            <p class="text-muted">Sin imagen disponible</p>
+                        {% endif %}
+
+                        <p><strong>Usuario:</strong> {{ procesador.user.username|default_if_none:"Desconocido" }}</p>
+
+                        <p><strong>URL de Compra:</strong> 
+                            <a href="{{ procesador.urlcompra }}" target="_blank">{{ procesador.urlcompra|slice:":30" }}</a>
+                        </p>
+
+                        <hr>
+                        <h6 class="text-secondary">Placa Base</h6>
+                        {% if procesador.placabase %}
+                            <p><strong>Nombre:</strong> {{ procesador.placabase.nombre|default_if_none:"No asignado" }}</p>
+                        {% else %}
+                            <p class="text-muted">Sin placa base asignada</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12">
+                <h3 class="text-center">Lo sentimos, pero no hay procesadores disponibles en la API.</h3>
+            </div>
+        {% endfor %}
+    </div>
+
+{% endblock %}

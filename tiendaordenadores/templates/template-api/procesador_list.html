@@ -4,7 +4,7 @@
     <h1 class="display 3">Lista de procesadores!</h1>
 
     <div class="row">
-        {% for procesador in procesadores%}
+        {% for procesador in procesadores_mostrar%}
             <div class="col-sm-4 mb-2">
                 <p><strong>ID:</strong> {{ procesador.id_procesador|default_if_none:"No disponible" }}</p>  <!-- Si el id es None manda un mensaje--> 
     
@@ -23,7 +23,7 @@
                 </p>
             </div>
         {% empty %}
-            <h1>Lo sentimos pero no hay procesadores disponibles</h1>
+            <h1>Lo sentimos pero no hay procesadores disponibles API</h1>
         {% endfor %}
     </div>
 {% endblock%} 
