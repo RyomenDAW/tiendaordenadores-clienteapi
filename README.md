@@ -64,7 +64,7 @@ Añadir seguridad en OAUTH 2 a vuestra API REST. (1 punto)
 
 
     Guardar los tokens de acceso en una variable de entorno
-
+.env
 
 
     Llamar siempre a la variable de entorno y a las claves desde un único método.
@@ -79,12 +79,38 @@ Añadir seguridad en OAUTH 2 a vuestra API REST. (1 punto)
 Crear una variable de entorno, y añadir una clave para cada tipo de usuario que tengais en vuestra base de datos. Añadirlos en la variable de entorno. (Esta variable la tenéis que quitar del .gitignore, no es seguro, pero al estar en un entorno de aprendizaje, lo haremos asi)(1 punto)
 
 
+.env esta todo, mis 4 roles.
+
 ========================================================================================================================================================
 Crear dos consultas mejorada a un listado de otro modelo de vuestra aplicación. (1.5 punto)
 
+Grafica y Fuente
 
+class GraficaMejoradaSerializer(serializers.ModelSerializer):
+    user = UsuarioSerializer()
+    procesador = ProcesadorMejoradoSerializer(source='grafica_procesadores', read_only=True)
+    placabase = serializers.PrimaryKeyRelatedField(read_only=True)
+
+    class Meta:
+        model = Grafica
+        fields = ['id_grafica', 'urlcompra', 'nombre', 'familiagrafica', 'potenciacalculo', 
+                  'memoriavram', 'fecha_salida', 'trazadorayos', 'user', 'procesador', 'placabase']
+        
+class FuenteAlimentacionMejoradaSerializer(serializers.ModelSerializer):
+    user = UsuarioSerializer()
+    class Meta:
+        model = FuenteAlimentacion
+        fields = ['id_fuente', 'urlcompra', 'vatios', 'amperaje', 
+                  'conectoresdisponibles', 'calidadfuente', 'user']
+
+
+    path('template-api/grafica_list.html', views.graficas_lista_api, name='graficas_lista_api'),
+    path('template-api/fuente_list.html', views.fuentes_lista_api, name='fuentes_lista_api'),
 
 ========================================================================================================================================================
 Incluir otro tipo de autenticación a vuestra aplicación por API e incluir una consulta mejorada a oto modelo que no se haya realizado antes. Explicar como se configura mediante un documento o presentacion(2.5 punto)
 
-    Esto va en la presentacion que te he adjuntado previamente.
+    Esto va en el documento adjuntado, llamado securizacion API, de hecho te he puesto 2, ya que jwt creo que lo hara todo el mundo.
+
+El otro modelo sera  RAM.
+
