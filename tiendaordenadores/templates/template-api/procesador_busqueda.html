@@ -1,0 +1,31 @@
+{% extends "../estructura/templatefinal.html" %}
+
+{% block cabecera %}
+    <h1>Buscar Procesador</h1>
+{% endblock %}
+
+{% block contenido %}
+<form method="get" action="{% url 'procesador_busqueda_simple' %}">
+    <div class="form-group">
+        <label for="textoBusqueda">Texto de búsqueda</label>
+        <input type="text" class="form-control" id="textoBusqueda" name="textoBusqueda" value="{{ request.GET.textoBusqueda }}">
+    </div>
+    <button type="submit" class="btn btn-primary">Buscar</button>
+</form>
+
+
+    {% if procesadores %}
+        <h2>Resultados de búsqueda</h2>
+        <ul class="list-group">
+            {% for procesador in procesadores %}
+                <li class="list-group-item">
+                    <h4>{{ procesador.name }}</h4>
+                    <p>Precio: ${{ procesador.price }}</p>
+                    <p>{{ procesador.description }}</p>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>No se encontraron procesadores que coincidan con tu búsqueda.</p>
+    {% endif %}
+{% endblock %}

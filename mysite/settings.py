@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-4y@#q*rgd@2f!ela^nh2uv8+qltp1cjv_5nh674yvd-1-3zonf
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = ['127.0.0.0']
+ALLOWED_HOSTS = ['127.0.0.1', 'localhost']
 
 
 # Application definition
@@ -38,6 +38,9 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'tiendaordenadores',  # Tu aplicación debe estar aquí
+    'django_bootstrap5',
+        'django_bootstrap_icons',
+
 ]
 
 MIDDLEWARE = [
