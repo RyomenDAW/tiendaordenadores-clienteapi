@@ -1,0 +1,38 @@
+{% extends "estructura/base_simple.html" %}
+{% block contenido %}
+
+    <h1 class="display-3 text-center mb-4">¡Lista de Fuentes de Alimentación!</h1>
+
+    <div class="row">
+        {% for fuente in fuentes_mostrar %}
+            <div class="col-sm-4 mb-4">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title text-primary"><strong>Fuente de {{ fuente.vatios }}W</strong></h5>
+
+                        <p><strong>ID:</strong> {{ fuente.id_fuente|default_if_none:"No disponible" }}</p>
+
+                        <p><strong>Vatios:</strong> {{ fuente.vatios }}W</p>
+
+                        <p><strong>Amperaje:</strong> {{ fuente.amperaje|default_if_none:"No especificado" }} A</p>
+
+                        <p><strong>Conectores Disponibles:</strong> {{ fuente.conectoresdisponibles|default_if_none:"No especificado" }}</p>
+
+                        <p><strong>Calidad de la Fuente:</strong> {{ fuente.calidadfuente|default_if_none:"No especificado" }}</p>
+
+                        <p><strong>Usuario:</strong> {{ fuente.user.username|default_if_none:"Desconocido" }}</p>
+
+                        <p><strong>URL de Compra:</strong> 
+                            <a href="{{ fuente.urlcompra }}" target="_blank">{{ fuente.urlcompra|slice:":30" }}</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12">
+                <h3 class="text-center">Lo sentimos, pero no hay fuentes de alimentación disponibles en la API.</h3>
+            </div>
+        {% endfor %}
+    </div>
+
+{% endblock %}

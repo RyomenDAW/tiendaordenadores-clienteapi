@@ -1,0 +1,57 @@
+{% extends "estructura/base_simple.html" %}
+{% block contenido %}
+
+    <h1 class="display-3 text-center mb-4">¡Lista de Tarjetas Gráficas!</h1>
+
+    <div class="row">
+        {% for grafica in graficas_mostrar %}
+            <div class="col-sm-4 mb-4">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title text-primary"><strong>{{ grafica.nombre }}</strong></h5>
+
+                        <p><strong>ID:</strong> {{ grafica.id_grafica|default_if_none:"No disponible" }}</p>
+
+                        <p><strong>Familia de la Gráfica:</strong> {{ grafica.familiagrafica|slice:":10" }}</p>
+
+                        <p><strong>Potencia de Cálculo:</strong> {{ grafica.potenciacalculo|default_if_none:"Información no disponible" }}</p>
+
+                        <p><strong>Memoria VRAM:</strong> {{ grafica.memoriavram|default_if_none:"No especificado" }} GB</p>
+
+                        <p><strong>Fecha de Salida:</strong> {{ grafica.fecha_salida|date:"d M Y" }}</p>
+
+                        <p><strong>¿Tiene Trazado de Rayos?:</strong> 
+                            {% if grafica.trazadorayos %} ✅ Sí {% else %} ❌ No {% endif %}
+                        </p>
+
+                        <p><strong>Usuario:</strong> {{ grafica.user.username|default_if_none:"Desconocido/No disponible" }}</p>
+                        {% comment %} Si aparece vacio de literalmente nada es kazan el creador, superuser {% endcomment %}
+                        <p><strong>URL de Compra:</strong> 
+                            <a href="{{ grafica.urlcompra }}" target="_blank">{{ grafica.urlcompra|slice:":30" }}</a>
+                        </p>
+
+                        <hr>
+                        <h6 class="text-secondary">Procesador Relacionado</h6>
+                        {% if grafica.procesador %}
+                            <p><strong>Nombre:</strong> {{ grafica.procesador.nombre|default_if_none:"No asignado" }}</p>
+                        {% else %}
+                            <p class="text-muted">Sin procesador relacionado</p>
+                        {% endif %}
+
+                        <h6 class="text-secondary">Placa Base</h6>
+                        {% if grafica.placabase %}
+                            <p><strong>Nombre:</strong> {{ grafica.placabase.nombre|default_if_none:"No asignado" }}</p>
+                        {% else %}
+                            <p class="text-muted">Sin placa base asignada</p>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12">
+                <h3 class="text-center">Lo sentimos, pero no hay tarjetas gráficas disponibles en la API.</h3>
+            </div>
+        {% endfor %}
+    </div>
+
+{% endblock %}

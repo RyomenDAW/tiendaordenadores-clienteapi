@@ -1,0 +1,38 @@
+<!-- grafica_busqueda.html -->
+
+{% extends "estructura/base_simple.html" %}
+
+{% block cabecera %}
+    <h1>Buscar Gráficas Avanzadas</h1>
+{% endblock %}
+
+{% block contenido %}
+    <div class="container mt-5">
+        <form method="get" action="{% url 'grafica_busqueda_avanzada' %}">
+            <div class="form-group">
+                <label for="nombre">Nombre de la Gráfica</label>
+                <input type="text" class="form-control" id="nombre" name="nombre" value="{{ request.GET.nombre }}">
+            </div>
+            <div class="form-group">
+                <label for="familiagrafica">Familia de la Gráfica</label>
+                <input type="text" class="form-control" id="familiagrafica" name="familiagrafica" value="{{ request.GET.familiagrafica }}">
+            </div>
+            <div class="form-group">
+                <label for="potenciacalculo">Potencia de Cálculo</label>
+                <input type="number" class="form-control" id="potenciacalculo" name="potenciacalculo" value="{{ request.GET.potenciacalculo }}">
+            </div>
+            <button type="submit" class="btn btn-primary">Buscar</button>
+        </form>
+
+        {% if graficas %}
+            <h2 class="mt-4">Resultados de búsqueda avanzada</h2>
+            <ul class="list-group mt-3">
+                {% for grafica in graficas %}
+                    <li class="list-group-item"> Nombre: {{ grafica.nombre }} - Familia: {{ grafica.familiagrafica }} - Potencia Calculo: {{ grafica.potenciacalculo }} </li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="mt-4">No se encontraron gráficas.</p>
+        {% endif %}
+    </div>
+{% endblock %}

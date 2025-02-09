@@ -1,0 +1,29 @@
+{% extends "estructura/base_simple.html"%}
+{% block contenido %}
+
+    <h1 class="display 3">Lista de procesadores!</h1>
+
+    <div class="row">
+        {% for procesador in procesadores_mostrar%}
+            <div class="col-sm-4 mb-2">
+                <p><strong>ID:</strong> {{ procesador.id_procesador|default_if_none:"No disponible" }}</p>  <!-- Si el id es None manda un mensaje--> 
+    
+                <p><strong>Nombre:</strong> {{ procesador.nombre }}</p>
+                
+                <p><strong>Familia del Procesador:</strong> {{ procesador.familiaprocesador|slice:":10" }}</p> <!-- Extrae 10 primeros caracteres, como Intel y AMD son 5, y 3, no dara error -->
+                
+                <p><strong>Potencia de Cálculo:</strong> {{ procesador.potenciacalculo|default_if_none:"Información no disponible" }}</p>  
+                
+                <p><strong>Núcleos:</strong> {{ procesador.nucleos|default_if_none:"No especificado" }}</p>
+                
+                <p><strong>Hilos:</strong> {{ procesador.hilos|default_if_none:"No especificado" }}</p>
+                
+                <p><strong>URL de Compra:</strong> 
+                    <a href="{{ procesador.urlcompra }}">{{ procesador.urlcompra|slice:":30" }}</a>
+                </p>
+            </div>
+        {% empty %}
+            <h1>Lo sentimos pero no hay procesadores disponibles API</h1>
+        {% endfor %}
+    </div>
+{% endblock%} 

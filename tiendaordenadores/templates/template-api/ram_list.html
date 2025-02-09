@@ -1,0 +1,36 @@
+{% extends "estructura/base_simple.html" %}
+{% block contenido %}
+
+    <h1 class="display-3 text-center mb-4">¡Lista de RAMs!</h1>
+
+    <div class="row">
+        {% for ram in rams_mostrar %}
+            <div class="col-sm-4 mb-4">
+                <div class="card shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title text-primary"><strong>{{ ram.mhz }} MHz - {{ ram.familiaram }}</strong></h5>
+
+                        <p><strong>ID:</strong> {{ ram.id_ram|default_if_none:"No disponible" }}</p>
+
+                        <p><strong>Fecha de Fabricación:</strong> {{ ram.fecha_fabricacion|date:"d M Y" }}</p>
+
+                        <p><strong>Factor de Memoria:</strong> {{ ram.factormemoria|default_if_none:"No especificado" }} GB</p>
+
+                        <p><strong>RGB:</strong> 
+                            {% if ram.rgb %} ✅ Sí {% else %} ❌ No {% endif %}
+                        </p>
+
+                        <p><strong>Usuario:</strong> {{ ram.user.username|default_if_none:"Desconocido/No disponible" }}</p>
+
+                        <hr>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <div class="col-12">
+                <h3 class="text-center">Lo sentimos, pero no hay RAMs disponibles en la API.</h3>
+            </div>
+        {% endfor %}
+    </div>
+
+{% endblock %}

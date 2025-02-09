@@ -1,0 +1,60 @@
+
+
+{% block content %}
+<h1>Búsqueda Avanzada de Procesadores</h1>
+
+<!-- Formulario de búsqueda avanzada -->
+<form method="get" action="{% url 'read_procesadores' %}">
+    {{ form.non_field_errors }}
+    
+    <div>
+        <label for="id_nombreBusqueda">Nombre:</label>
+        {{ form.nombreBusqueda }}
+        {{ form.nombreBusqueda.errors }}
+    </div>
+    
+    <div>
+        <label for="id_nucleos">Núcleos:</label>
+        {{ form.nucleos }}
+        {{ form.nucleos.errors }}
+    </div>
+    
+    <div>
+        <label for="id_hilos">Hilos:</label>
+        {{ form.hilos }}
+        {{ form.hilos.errors }}
+    </div>
+    
+    <div>
+        <label for="id_familiaprocesador">Familia de Procesador:</label>
+        {{ form.familiaprocesador }}
+        {{ form.familiaprocesador.errors }}
+    </div>
+    
+    <button type="submit">Buscar</button>
+</form>
+
+<hr>
+
+<!-- Tabla de resultados de la búsqueda -->
+<h2>Resultados de la Búsqueda</h2>
+<table>
+    <thead>
+        <tr>
+            <th>Nombre</th>
+            <th>Núcleos</th>
+            <th>Hilos</th>
+            <th>Familia</th>
+        </tr>
+    </thead>
+    <tbody>
+        {% for procesador in procesadores %}
+        {% include "../estructura/procesadores_for.html" %}
+        {% empty %}
+        <tr>
+            <td colspan="4">No se encontraron procesadores con esos criterios de búsqueda.</td>
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+{% endblock %}

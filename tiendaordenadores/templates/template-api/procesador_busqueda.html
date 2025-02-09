@@ -1,0 +1,38 @@
+{% extends "estructura/base_simple.html" %}
+
+{% block cabecera %}
+    <h1>Buscar Procesador</h1>
+{% endblock %}
+
+{% block contenido %}
+    <div class="container mt-5">
+        <form method="get" action="{% url 'procesador_busqueda' %}">
+            <div class="form-group">
+                <label for="textoBusqueda">Texto de búsqueda</label>
+                <input type="text" class="form-control" id="textoBusqueda" name="textoBusqueda" value="{{ request.GET.textoBusqueda }}">
+            </div>
+            <button type="submit" class="btn btn-primary">Buscar</button>
+        </form>
+
+        {% if procesadores %}
+            <h2 class="mt-4">Resultados de búsqueda</h2>
+            <div class="row">
+                {% for procesador in procesadores %}
+                    <div class="col-sm-4 mb-2">
+                        <p><strong>ID:</strong> {{ procesador.id_procesador|default_if_none:"No disponible" }}</p>  
+                        <p><strong>Nombre:</strong> {{ procesador.nombre }}</p>
+                        <p><strong>Familia del Procesador:</strong> {{ procesador.familiaprocesador|slice:":10" }}</p> 
+                        <p><strong>Potencia de Cálculo:</strong> {{ procesador.potenciacalculo|default_if_none:"Información no disponible" }}</p>  
+                        <p><strong>Núcleos:</strong> {{ procesador.nucleos|default_if_none:"No especificado" }}</p>
+                        <p><strong>Hilos:</strong> {{ procesador.hilos|default_if_none:"No especificado" }}</p>
+                        <p><strong>URL de Compra:</strong> 
+                            <a href="{{ procesador.urlcompra }}">{{ procesador.urlcompra|slice:":30" }}</a>
+                        </p>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="mt-4">No se encontraron procesadores.</p>
+        {% endif %}
+    </div>
+{% endblock %}

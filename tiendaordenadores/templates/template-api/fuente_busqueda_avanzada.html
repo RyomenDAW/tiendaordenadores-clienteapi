@@ -1,0 +1,38 @@
+<!-- fuente_busqueda.html -->
+
+{% extends "estructura/base_simple.html" %}
+
+{% block cabecera %}
+    <h1>Buscar Fuentes de Alimentación Avanzadas</h1>
+{% endblock %}
+
+{% block contenido %}
+    <div class="container mt-5">
+        <form method="get" action="{% url 'fuente_busqueda_avanzada' %}">
+            <div class="form-group">
+                <label for="vatios">Vatios</label>
+                <input type="number" class="form-control" id="vatios" name="vatios" value="{{ request.GET.vatios }}">
+            </div>
+            <div class="form-group">
+                <label for="calidadfuente">Calidad de la Fuente</label>
+                <input type="text" class="form-control" id="calidadfuente" name="calidadfuente" value="{{ request.GET.calidadfuente }}">
+            </div>
+            <div class="form-group">
+                <label for="amperaje">Amperaje</label>
+                <input type="number" class="form-control" id="amperaje" name="amperaje" step="any" value="{{ request.GET.amperaje }}">
+            </div>
+            <button type="submit" class="btn btn-primary">Buscar</button>
+        </form>
+
+        {% if fuentes %}
+            <h2 class="mt-4">Resultados de búsqueda avanzada</h2>
+            <ul class="list-group mt-3">
+                {% for fuente in fuentes %}
+                    <li class="list-group-item">{{ fuente.vatios }}W - {{ fuente.calidadfuente }} - {{ fuente.amperaje }}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="mt-4">No se encontraron fuentes de alimentación.</p>
+        {% endif %}
+    </div>
+{% endblock %}

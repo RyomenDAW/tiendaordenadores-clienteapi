@@ -1,0 +1,15 @@
+{% extends "../estructura/templatefinal.html" %}
+{% block cabecera %}
+{% endblock %}
+
+
+{% block contenido %}
+    
+    {% for grafica in graficas %}
+    {% include "../estructura/graficas_for.html" %}
+
+    {% endfor %}
+    {% endblock %}
+    
+</body>
+</html>

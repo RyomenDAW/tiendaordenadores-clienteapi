@@ -1,0 +1,41 @@
+<!-- ram_busqueda.html -->
+
+{% extends "estructura/base_simple.html" %}
+
+{% block cabecera %}
+    <h1>Buscar RAM Avanzada</h1>
+{% endblock %}
+
+{% block contenido %}
+    <div class="container mt-5">
+        <form method="get" action="{% url 'ram_busqueda_avanzada' %}">
+            <div class="form-group">
+                <label for="mhz">Frecuencia (MHz!)</label>
+                <input type="text" class="form-control" id="mhz" name="mhz" value="{{ request.GET.mhz }}">
+            </div>
+            <div class="form-group">
+                <label for="familiaram">Familia de RAM</label>
+                <input type="text" class="form-control" id="familiaram" name="familiaram" value="{{ request.GET.familiaram }}">
+            </div>
+            <div class="form-group">
+                <label for="rgb">¿RGB?</label>
+                <select class="form-control" id="rgb" name="rgb">
+                    <option value="true" {% if request.GET.rgb == "true" %}selected{% endif %}>Sí</option>
+                    <option value="false" {% if request.GET.rgb == "false" %}selected{% endif %}>No</option>
+                </select>
+            </div>
+            <button type="submit" class="btn btn-primary">Buscar</button>
+        </form>
+
+        {% if rams %}
+            <h2 class="mt-4">Resultados de búsqueda avanzada</h2>
+            <ul class="list-group mt-3">
+                {% for ram in rams %}
+                    <li class="list-group-item">{{ ram.mhz }} MHz - {{ ram.familiaram }} - {% if ram.rgb %}Con RGB{% else %}Sin RGB{% endif %}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p class="mt-4">No se encontraron RAMs.</p>
+        {% endif %}
+    </div>
+{% endblock %}
