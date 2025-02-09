@@ -39,7 +39,7 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'tiendaordenadores',  # Tu aplicación debe estar aquí
     'django_bootstrap5',
-        'django_bootstrap_icons',
+    'django_bootstrap_icons',
 
 ]
 

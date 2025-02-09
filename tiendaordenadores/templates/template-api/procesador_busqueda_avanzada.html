@@ -1,0 +1,60 @@
+{% extends "estructura/base_simple.html" %}
+
+{% block cabecera %}
+    <h1>Búsqueda Avanzada de Procesadores</h1>
+{% endblock %}
+
+{% block contenido %}
+    <div class="container mt-5">
+        <form method="get" action="{% url 'procesador_busqueda_avanzada' %}">
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="nombre">Nombre del Procesador</label>
+                    <input type="text" class="form-control" id="nombre" name="nombre" value="{{ request.GET.nombre }}">
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="familiaprocesador">Familia del Procesador</label>
+                    <input type="text" class="form-control" id="familiaprocesador" name="familiaprocesador" value="{{ request.GET.familiaprocesador }}">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="nucleos">Número de Núcleos</label>
+                    <input type="number" class="form-control" id="nucleos" name="nucleos" value="{{ request.GET.nucleos }}">
+                </div>
+                <div class="form-group col-md-6">
+                    <label for="hilos">Número de Hilos</label>
+                    <input type="number" class="form-control" id="hilos" name="hilos" value="{{ request.GET.hilos }}">
+                </div>
+            </div>
+            <div class="form-row">
+                <div class="form-group col-md-6">
+                    <label for="potenciacalculo">Potencia de Cálculo</label>
+                    <input type="text" class="form-control" id="potenciacalculo" name="potenciacalculo" value="{{ request.GET.potenciacalculo }}">
+                </div>
+            </div>
+            <button type="submit" class="btn btn-primary">Buscar</button>
+        </form>
+
+        {% if procesadores %}
+            <h2 class="mt-4">Resultados de Búsqueda Avanzada</h2>
+            <div class="row">
+                {% for procesador in procesadores %}
+                    <div class="col-sm-4 mb-2">
+                        <p><strong>ID:</strong> {{ procesador.id_procesador|default_if_none:"No disponible" }}</p>  <!-- Si el id es None manda un mensaje--> 
+                        <p><strong>Nombre:</strong> {{ procesador.nombre }}</p>
+                        <p><strong>Familia del Procesador:</strong> {{ procesador.familiaprocesador|slice:":10" }}</p> <!-- Extrae 10 primeros caracteres, como Intel y AMD son 5, y 3, no dara error -->
+                        <p><strong>Potencia de Cálculo:</strong> {{ procesador.potenciacalculo|default_if_none:"Información no disponible" }}</p>  
+                        <p><strong>Núcleos:</strong> {{ procesador.nucleos|default_if_none:"No especificado" }}</p>
+                        <p><strong>Hilos:</strong> {{ procesador.hilos|default_if_none:"No especificado" }}</p>
+                        <p><strong>URL de Compra:</strong> 
+                            <a href="{{ procesador.urlcompra }}">{{ procesador.urlcompra|slice:":30" }}</a>
+                        </p>
+                    </div>
+                {% endfor %}
+            </div>
+        {% else %}
+            <p class="mt-4">No se encontraron procesadores que coincidan con los filtros.</p>
+        {% endif %}
+    </div>
+{% endblock %}
