@@ -1,6 +1,8 @@
 from django import forms
 from datetime import date
 from django.contrib.auth.forms import UserCreationForm
+from .helper import helper
+
 #================================================================================================================================
 
 class BusquedaAvanzadaProcesador(forms.Form):
@@ -167,3 +169,56 @@ class BusquedaAvanzadaRam(forms.Form):
         label="URL de Compra",
         max_length=100,
     )
+
+#======================================================================================================================================================
+
+
+class ProcesadorForm(forms.Form):
+    FAMILIA_PROCESADOR = (
+    ("Ryzen", "Ryzen"),
+    ("Intel", "Intel"),
+    )
+    
+    
+    nombre = forms.CharField (label="Nombre del procesador",
+                              required=True, max_length=100,
+                              help_text="100 caracteres como maximo")
+    
+    urlcompra = forms.URLField(label="URL de compra",
+                               required=True, max_length=100,
+                               help_text="100 caracteres como maximo")
+    
+    familaprocesador = forms.ChoiceField(
+        label="Familia del procesador",
+        choices=FAMILIA_PROCESADOR,
+        required=True
+    )
+    
+    potenciacalculo = forms.IntegerField (label="Potencia del procesador",
+                              required=True,
+                              help_text="50 cifras como maximo")
+    
+    nucleos = forms.IntegerField (label="Potencia del procesador",
+                              required=True,
+                              help_text="50 cifras como maximo")
+    
+    hilos = forms.IntegerField (label="Hilos del procesador",
+                              required=True,
+                              help_text="50 cifras como maximo")
+    
+    imagen = forms.ImageField(label = "Imagen del procesador",required=False)                            
+    # class Procesador (models.Model):
+    # id_procesador = models.AutoField(primary_key=True)
+    # urlcompra = models.URLField(max_length=100)
+    # nombre = models.TextField(max_length=100)
+    # familiaprocesador = models.TextField(max_length=6, choices=FAMILIA_PROCESADOR)
+    # potenciacalculo = models.PositiveBigIntegerField()
+    # nucleos = models.PositiveSmallIntegerField()
+    # hilos = models.PositiveIntegerField(validators=[MinValueValidator(35000)])  # Este validator luego se suprime por el form y view xd
+    # imagen = models.ImageField(upload_to='procesadores/', blank=True, null=True)
+    # user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)  # Aquí usamos CustomUser en lugar de User
+
+    # # Relación OneToOne con PlacaBase
+    # placabase = models.OneToOneField('PlacaBase', on_delete=models.CASCADE, null=True, blank=True)
+    # user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)  # Aquí usamos CustomUser en lugar de User   
+    

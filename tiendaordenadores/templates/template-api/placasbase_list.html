@@ -1,0 +1,64 @@
+{% extends "estructura/base_simple.html" %}
+{% block contenido %}
+
+    <h1 class="display-3">Lista de Placas Base</h1>
+
+    <div class="row">
+        {% for placa in placasbase_mostrar %}
+            <div class="col-sm-4 mb-2">
+                <div class="card">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ placa.nombre }}</h5>
+
+                        <p><strong>ID:</strong> {{ placa.id_placabase|default_if_none:"No disponible" }}</p> 
+
+                        <p><strong>Familia de la Placa Base:</strong> {{ placa.familiaplacabase|slice:":10" }}</p> 
+
+                        <p><strong>VRM de la Placa:</strong> {{ placa.vrm_placa|default_if_none:"No especificado" }}</p>  
+
+                        <p><strong>RGB:</strong> 
+                            {% if placa.rgb %}
+                                <span class="badge bg-success">Sí</span>
+                            {% else %}
+                                <span class="badge bg-danger">No</span>
+                            {% endif %}
+                        </p>
+
+                        <p><strong>Discos Duros Compatibles:</strong> 
+                            {% for hdd in placa.hdds %}
+                                <span class="badge bg-primary">{{ hdd.nombre }}</span>
+                            {% empty %}
+                                <span class="text-muted">No especificado</span>
+                            {% endfor %}
+                        </p>
+
+                        <p><strong>Monitores Compatibles:</strong> 
+                            {% for monitor in placa.monitores %}
+                                <span class="badge bg-info">{{ monitor.nombre }}</span>
+                            {% empty %}
+                                <span class="text-muted">No especificado</span>
+                            {% endfor %}
+                        </p>
+
+                        <p><strong>RAM Compatible:</strong> 
+                            {% for ram in placa.rams %}
+                                <span class="badge bg-warning">{{ ram.nombre }}</span>
+                            {% empty %}
+                                <span class="text-muted">No especificado</span>
+                            {% endfor %}
+                        </p>
+
+                        <p><strong>URL de Compra:</strong> 
+                            <a href="{{ placa.urlcompra }}" target="_blank">
+                                {{ placa.urlcompra|slice:":30" }}...
+                            </a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+        {% empty %}
+            <h1>Lo sentimos, pero no hay placas base disponibles en la API.</h1>
+        {% endfor %}
+    </div>
+
+{% endblock %}

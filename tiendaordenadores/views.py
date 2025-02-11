@@ -9,7 +9,7 @@ import environ
 import os
 from pathlib import Path
 
-
+from django.http import JsonResponse
 
 # Configuración de variables de entorno
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -141,13 +141,40 @@ def procesadores_lista_api(request):
     procesadores = response.json()
     return render(request, 'template-api/procesador_list.html', {"procesadores_mostrar": procesadores})
 
-# Versión mejorada de procesadores
+def placasbase_lista_api(request):
+   headers = crear_cabecera()
+   url = f"{api_base_url}{version}/placasbase"
+   response = requests.get(url, headers=headers)
+   placasbase = response.json()
+   return render(request, 'template-api/placasbase_list.html', {"placasbase_mostrar": placasbase})
+
+
 def procesadores_lista_mejorada_api(request):
     headers = crear_cabecera()
     url = f"{api_base_url}{version}/procesadores-mejorados"
-    response = requests.get(url, headers=headers)
-    procesadores = response.json()
+
+    try:
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()  # 🚨 Esto lanza un error si la API devuelve 404 o 500
+
+        print("🔎 Respuesta de la API:", response.text)  # 🔥 DEPURACIÓN: Mira qué está devolviendo la API
+
+        procesadores = response.json()  # 👈 Aquí puede estar fallando
+
+    except requests.exceptions.HTTPError as http_err:
+        print(f"❌ Error HTTP al obtener procesadores: {http_err}")
+        return render(request, 'errores/500.html', {"error": f"Error HTTP: {http_err}"})
+
+    except requests.exceptions.JSONDecodeError:
+        print("❌ La API no devolvió un JSON válido")
+        return render(request, 'errores/500.html', {"error": "La API no devolvió un JSON válido"})
+
+    except requests.exceptions.RequestException as req_err:
+        print(f"❌ Error de conexión con la API: {req_err}")
+        return render(request, 'errores/500.html', {"error": "Error de conexión con la API"})
+
     return render(request, 'template-api/procesador_list_mejorado.html', {"procesadores_mostrar": procesadores})
+
 
 # Listado de gráficas
 def graficas_lista_api(request):
@@ -172,6 +199,7 @@ def rams_lista_api(request):
     response = requests.get(url, headers=headers)
     rams = response.json()
     return render(request, 'template-api/ram_list.html', {"rams_mostrar": rams})
+
 
 
 #===========================================================================================================================================
