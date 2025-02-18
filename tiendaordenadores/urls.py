@@ -33,6 +33,8 @@ urlpatterns = [
     path('template-api/fuente_busqueda_avanzada/', views.fuente_busqueda_avanzada, name='fuente_busqueda_avanzada'),
     path('template-api/ram_busqueda_avanzada/', views.ram_busqueda_avanzada, name='ram_busqueda_avanzada'),
     #==================================================================================================================================================
+    path('procesadores/crear/', views.crear_procesador, name='crear_procesador'),
+
     # path('registrar',views.registrar_usuario, name='registrar_usuario'),
     # path('logout/', LogoutView.as_view(), name='logout'),  # Ruta para el logout
     # path('libros/busqueda_simple',views.libro_busqueda_simple,name='libro_buscar_simple'),

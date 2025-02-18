@@ -372,6 +372,43 @@ def ram_busqueda_avanzada(request):
     
 #===============================================================================================================================================================
     
+    
+def crear_procesador(request):
+    if request.method == "POST":
+        form = ProcesadorForm(request.POST, request.FILES)
+
+        if form.is_valid():
+            headers = {
+                'Authorization': 'Bearer ' + env("ACCESS_TOKEN"),
+                'Content-Type': "application/json"
+            }
+
+            data = {
+                "nombre": form.cleaned_data["nombre"],
+                "urlcompra": form.cleaned_data["urlcompra"],
+                "familaprocesador": form.cleaned_data["familaprocesador"],
+                "potenciacalculo": form.cleaned_data["potenciacalculo"],
+                "nucleos": form.cleaned_data["nucleos"],
+                "hilos": form.cleaned_data["hilos"]
+            }
+
+            response = requests.post("http://127.0.0.1:8000/template-api/procesadores/", json=data, headers=headers)
+
+            if response.status_code == 201:
+                return redirect("inicio")  # 🔹 Redirigir tras crear el procesador
+            else:
+                error_message = f"Error {response.status_code}: {response.text}"  # 🔴 Capturar error de la API
+                print("❌ Error en API:", error_message)  
+                form.add_error(None, error_message)  
+
+    else:
+        form = ProcesadorForm()
+
+    return render(request, 'procesadores/crear_procesador.html', {'form': form})
+
+
+
+
 # def libro_busqueda_simple(request):
 #     formulario = BusquedaLibroForm(request.GET)
     

@@ -57,6 +57,8 @@ class BusquedaSimpleProcesador(forms.Form):
         label="Nombre del Procesador",
         max_length=100,
     )
+    
+    
 #======================================================================================================================================================
 
 class BusquedaAvanzadaGrafica(forms.Form):
@@ -198,7 +200,7 @@ class ProcesadorForm(forms.Form):
                               required=True,
                               help_text="50 cifras como maximo")
     
-    nucleos = forms.IntegerField (label="Potencia del procesador",
+    nucleos = forms.IntegerField (label="Nucleos del procesador",
                               required=True,
                               help_text="50 cifras como maximo")
     
@@ -206,7 +208,11 @@ class ProcesadorForm(forms.Form):
                               required=True,
                               help_text="50 cifras como maximo")
     
-    imagen = forms.ImageField(label = "Imagen del procesador",required=False)                            
+    imagen = forms.ImageField(label = "Imagen del procesador",required=False)    
+    
+    
+    
+                            
     # class Procesador (models.Model):
     # id_procesador = models.AutoField(primary_key=True)
     # urlcompra = models.URLField(max_length=100)
