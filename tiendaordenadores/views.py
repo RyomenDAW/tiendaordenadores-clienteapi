@@ -111,7 +111,7 @@ def obtener_datos_api():
     headers = crear_cabecera()
     
     # Paso 5: Construir la URL de la API basada en la versión seleccionada
-    url = f'http://127.0.0.1:8000/api/{api_version}/procesadores'  # Ejemplo: 'http://127.0.0.1:8000/api/v1/procesadores'
+    url = f'http://127.0.0.1:8000/{api_version}/procesadores'  # Ejemplo: 'http://127.0.0.1:8000/api/v1/procesadores'
     
     # Paso 6: Realizar la petición GET a la API
     if formato == 'xml':
@@ -136,7 +136,7 @@ def inicio(request):
 # Listado de procesadores
 def procesadores_lista_api(request):
     headers = crear_cabecera()
-    url = f"{api_base_url}{version}/procesadores"
+    url = f"{api_base_url}template-api/procesadores"
     response = requests.get(url, headers=headers)
     procesadores = response.json()
     return render(request, 'template-api/procesador_list.html', {"procesadores_mostrar": procesadores})
