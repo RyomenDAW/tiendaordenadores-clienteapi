@@ -706,6 +706,10 @@ def eliminar_monitor_grafica_cliente(request, relacion_id):
 
 #=============================================================================================================
 
+
+ #Viewsets
+
+        
 # def libro_busqueda_simple(request):
 #     formulario = BusquedaLibroForm(request.GET)
     
