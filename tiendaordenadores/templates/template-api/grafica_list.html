@@ -11,21 +11,16 @@
                         <h5 class="card-title text-primary"><strong>{{ grafica.nombre }}</strong></h5>
 
                         <p><strong>ID:</strong> {{ grafica.id_grafica|default_if_none:"No disponible" }}</p>
-
                         <p><strong>Familia de la Gráfica:</strong> {{ grafica.familiagrafica|slice:":10" }}</p>
-
                         <p><strong>Potencia de Cálculo:</strong> {{ grafica.potenciacalculo|default_if_none:"Información no disponible" }}</p>
-
                         <p><strong>Memoria VRAM:</strong> {{ grafica.memoriavram|default_if_none:"No especificado" }} GB</p>
-
                         <p><strong>Fecha de Salida:</strong> {{ grafica.fecha_salida|date:"d M Y" }}</p>
-
                         <p><strong>¿Tiene Trazado de Rayos?:</strong> 
                             {% if grafica.trazadorayos %} ✅ Sí {% else %} ❌ No {% endif %}
                         </p>
 
                         <p><strong>Usuario:</strong> {{ grafica.user.username|default_if_none:"Desconocido/No disponible" }}</p>
-                        {% comment %} Si aparece vacio de literalmente nada es kazan el creador, superuser {% endcomment %}
+
                         <p><strong>URL de Compra:</strong> 
                             <a href="{{ grafica.urlcompra }}" target="_blank">{{ grafica.urlcompra|slice:":30" }}</a>
                         </p>
@@ -44,6 +39,15 @@
                         {% else %}
                             <p class="text-muted">Sin placa base asignada</p>
                         {% endif %}
+
+                        <hr>
+
+                        <!-- Botón de Eliminar -->
+                        <a href="{% url 'eliminar_grafica' grafica.id_grafica %}" 
+                        class="btn btn-danger w-100"
+                           onclick="return confirm('⚠️ ¿Estás seguro de que quieres eliminar esta gráfica? Esta acción no se puede deshacer.');">
+                           <i class="bi bi-trash"></i> Eliminar
+                        </a>
                     </div>
                 </div>
             </div>

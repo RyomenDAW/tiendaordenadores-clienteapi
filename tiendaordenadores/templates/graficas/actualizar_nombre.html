@@ -1,0 +1,16 @@
+{% extends "estructura/base_simple.html" %}
+{% load django_bootstrap5 %}
+
+{% block contenido %}
+<div class="container mt-5">
+    <h1 class="text-center">Actualizar Nombre de la Gráfica</h1>
+
+    <form method="POST" class="mt-4">
+        {% csrf_token %}
+        {% bootstrap_form formulario %}
+        <button type="submit" class="btn btn-primary mt-3">Actualizar Nombre</button>
+    </form>
+
+    <a href="{% url 'graficas_lista_api' %}" class="btn btn-secondary mt-3">Volver a la lista</a>
+</div>
+{% endblock %}

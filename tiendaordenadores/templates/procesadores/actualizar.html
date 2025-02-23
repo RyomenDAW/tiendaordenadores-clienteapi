@@ -3,28 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Crear Gráfica</title>
+    <title>Editar Procesador</title>
     {% load django_bootstrap5 %}
     {% bootstrap_css %}
 </head>
 <body>
     <div class="container mt-5">
-        <h1 class="text-center">Crear Nueva Gráfica</h1>
-        <form method="POST" class="mt-4">
+        <h1 class="text-center">Editar Procesador</h1>
+        <form method="POST" class="mt-4" enctype="multipart/form-data">
             {% csrf_token %}
-            {% bootstrap_form form %}
-            <button type="submit" class="btn btn-primary mt-3">Guardar</button>
+            {% bootstrap_form formulario %}
+            <button type="submit" class="btn btn-success mt-3">Actualizar Procesador</button>
         </form>
-        <a href="{% url 'graficas_lista_api' %}" class="btn btn-secondary mt-3">Volver a la lista</a>
+        <a href="{% url 'procesadores_lista_api' %}" class="btn btn-secondary mt-3">Volver a la lista</a>
     </div>
     {% bootstrap_javascript %}
 
-    {% if form.errors %}
+    {% if formulario.errors %}
     <div class="container mt-3">
         <div class="alert alert-danger">
             <strong>Errores:</strong>
             <ul>
-                {% for field, errors in form.errors.items %}
+                {% for field, errors in formulario.errors.items %}
                     <li><strong>{{ field }}</strong>: {{ errors|join:", " }}</li>
                 {% endfor %}
             </ul>
