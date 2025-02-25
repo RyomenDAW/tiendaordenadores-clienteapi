@@ -9,7 +9,7 @@ import environ
 import os
 from pathlib import Path
 
-
+from django.http import JsonResponse
 
 # Configuración de variables de entorno
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -92,9 +92,9 @@ api_formatos = json.loads(env('API_FORMATOS'))  # Convertimos la cadena JSON en 
 # Función para crear cabeceras
 def crear_cabecera():
     return {
-        'Authorization': 'Bearer '+env("ACCESS_TOKEN"),
+        'Authorization': 'Token ' + env("ACCESS_TOKEN"),  # 🔹 Usa "Token" en lugar de "Bearer"
         "Content-Type": "application/json"
-}
+    }
         
 
 def obtener_datos_api():
@@ -141,13 +141,40 @@ def procesadores_lista_api(request):
     procesadores = response.json()
     return render(request, 'template-api/procesador_list.html', {"procesadores_mostrar": procesadores})
 
-# Versión mejorada de procesadores
+def placasbase_lista_api(request):
+   headers = crear_cabecera()
+   url = f"{api_base_url}{version}/placasbase"
+   response = requests.get(url, headers=headers)
+   placasbase = response.json()
+   return render(request, 'template-api/placasbase_list.html', {"placasbase_mostrar": placasbase})
+
+
 def procesadores_lista_mejorada_api(request):
     headers = crear_cabecera()
     url = f"{api_base_url}{version}/procesadores-mejorados"
-    response = requests.get(url, headers=headers)
-    procesadores = response.json()
+
+    try:
+        response = requests.get(url, headers=headers)
+        response.raise_for_status()  # 🚨 Esto lanza un error si la API devuelve 404 o 500
+
+        print("🔎 Respuesta de la API:", response.text)  # 🔥 DEPURACIÓN: Mira qué está devolviendo la API
+
+        procesadores = response.json()  # 👈 Aquí puede estar fallando
+
+    except requests.exceptions.HTTPError as http_err:
+        print(f"❌ Error HTTP al obtener procesadores: {http_err}")
+        return render(request, 'errores/500.html', {"error": f"Error HTTP: {http_err}"})
+
+    except requests.exceptions.JSONDecodeError:
+        print("❌ La API no devolvió un JSON válido")
+        return render(request, 'errores/500.html', {"error": "La API no devolvió un JSON válido"})
+
+    except requests.exceptions.RequestException as req_err:
+        print(f"❌ Error de conexión con la API: {req_err}")
+        return render(request, 'errores/500.html', {"error": "Error de conexión con la API"})
+
     return render(request, 'template-api/procesador_list_mejorado.html', {"procesadores_mostrar": procesadores})
+
 
 # Listado de gráficas
 def graficas_lista_api(request):
@@ -172,6 +199,7 @@ def rams_lista_api(request):
     response = requests.get(url, headers=headers)
     rams = response.json()
     return render(request, 'template-api/ram_list.html', {"rams_mostrar": rams})
+
 
 
 #===========================================================================================================================================
@@ -344,6 +372,344 @@ def ram_busqueda_avanzada(request):
     
 #===============================================================================================================================================================
     
+   # Vista para manejar el formulario y hacer un POST a la API (Crear Procesador)
+def crear_procesador(request):
+    if request.method == "POST":
+        form = ProcesadorForm(request.POST, request.FILES)
+
+        if form.is_valid():
+            headers = crear_cabecera()
+
+            data = {
+                "nombre": form.cleaned_data["nombre"],
+                "urlcompra": form.cleaned_data["urlcompra"],
+                "familiaprocesador": form.cleaned_data["familiaprocesador"],
+                "potenciacalculo": form.cleaned_data["potenciacalculo"],
+                "nucleos": form.cleaned_data["nucleos"],
+                "hilos": form.cleaned_data["hilos"]
+            }
+
+            response = requests.post(
+                "http://127.0.0.1:8000/template-api/procesadores/",
+                json=data,
+                headers=headers
+            )
+
+            if response.status_code == 201:
+                messages.success(request, "✅ Procesador creado correctamente.")
+                return redirect("procesadores_lista_api")
+            else:
+                error_message = f"Error {response.status_code}: {response.text}"
+                form.add_error(None, error_message)
+
+    else:
+        form = ProcesadorForm()
+
+    return render(request, 'procesadores/crear_procesador.html', {'form': form})
+
+
+# Vista para Editar un Procesador
+def editar_procesador(request, procesador_id):
+    procesador_data = helper.obtener_procesador(procesador_id)
+
+    if not procesador_data:
+        messages.error(request, "❌ No se encontró el procesador.")
+        return redirect("procesadores_lista_api")
+
+    if request.method == "POST":
+        form = ProcesadorForm(request.POST, request.FILES)
+
+        if form.is_valid():
+            datos = {
+                "nombre": form.cleaned_data["nombre"],
+                "urlcompra": form.cleaned_data["urlcompra"],
+                "familiaprocesador": form.cleaned_data["familiaprocesador"],
+                "potenciacalculo": form.cleaned_data["potenciacalculo"],
+                "nucleos": form.cleaned_data["nucleos"],
+                "hilos": form.cleaned_data["hilos"]
+            }
+
+            result = helper.api_request("put", f"{procesador_id}/", data=datos)
+
+            if result:
+                messages.success(request, "✅ Procesador actualizado correctamente.")
+                return redirect("procesadores_lista_api")
+            else:
+                form.add_error(None, "❌ Error al actualizar el procesador.")
+
+    else:
+        form = ProcesadorForm(initial=procesador_data)
+
+    return render(request, "procesadores/actualizar.html", {"formulario": form})
+
+
+# Vista para actualizar solo el nombre de un procesador
+def actualizar_nombre_procesador(request, procesador_id):
+    procesador_data = helper.obtener_procesador(procesador_id)
+
+    if not procesador_data:
+        messages.error(request, "❌ No se encontró el procesador.")
+        return redirect("procesadores_lista_api")
+
+    if request.method == "POST":
+        form = ProcesadorActualizarNombreForm(request.POST)
+
+        if form.is_valid():
+            nuevo_nombre = form.cleaned_data["nombre"]
+
+            resultado = helper.actualizar_nombre_procesador(procesador_id, nuevo_nombre)
+
+            if resultado:
+                messages.success(request, "✅ Nombre del procesador actualizado correctamente.")
+                return redirect("procesadores_lista_api")
+            else:
+                form.add_error(None, "❌ Error al actualizar el nombre del procesador.")
+
+    else:
+        form = ProcesadorActualizarNombreForm(initial={"nombre": procesador_data["nombre"]})
+
+    return render(request, "procesadores/actualizar_nombre.html", {"formulario": form})
+
+
+# Vista para eliminar un procesador
+def eliminar_procesador(request, procesador_id):
+    resultado = helper.eliminar_procesador(procesador_id)
+
+    if resultado is not None:
+        messages.success(request, "✅ Procesador eliminado correctamente.")
+    else:
+        messages.error(request, "❌ Error al eliminar el procesador.")
+
+    return redirect("procesadores_lista_api")
+
+
+
+def crear_grafica_cliente(request):
+    if request.method == "POST":
+        form = GraficaForm(request.POST)
+
+        if form.is_valid():
+            headers = crear_cabecera()
+
+            datos = {
+                "nombre": form.cleaned_data["nombre"],
+                "urlcompra": form.cleaned_data["urlcompra"],
+                "familiagrafica": form.cleaned_data["familiagrafica"],
+                "potenciacalculo": form.cleaned_data["potenciacalculo"],
+                "memoriavram": form.cleaned_data["memoriavram"],
+                "trazadorayos": form.cleaned_data["trazadorayos"],
+                "grafica_procesadores": form.cleaned_data["grafica_procesadores"],  # Procesador asociado
+                "user": request.user.id  # 🔥 Asegurar que el usuario autenticado se pase
+            }
+
+            print("📡 Enviando datos:", datos)  # Debug para verificar lo que se envía
+
+            response = requests.post(
+                "http://127.0.0.1:8000/template-api/graficas/",
+                json=datos,
+                headers=headers
+            )
+
+            print("🔎 API Response:", response.status_code, response.text)  # Debug
+
+            if response.status_code == 201:
+                messages.success(request, "✅ ¡Gráfica creada con éxito!")  # ✅ Mensaje de éxito
+                return redirect("graficas_lista_api")  # Redirigir tras crear la gráfica
+            else:
+                form.add_error(None, f"❌ Error en API: {response.text}")
+
+    else:
+        form = GraficaForm()
+
+    return render(request, 'graficas/crear_grafica.html', {'form': form})
+
+
+
+def editar_grafica_cliente(request, grafica_id):
+    """ Editar una gráfica desde el cliente """
+
+    # Obtener datos actuales de la gráfica desde la API
+    grafica_data = helper.obtener_grafica(grafica_id)
+
+    if not grafica_data:
+        messages.error(request, "❌ No se encontró la gráfica.")
+        return redirect("graficas_lista_api")
+
+    if request.method == "POST":
+        form = GraficaForm(request.POST)
+
+        if form.is_valid():
+            headers = crear_cabecera()
+
+            datos = {
+                "nombre": form.cleaned_data["nombre"],
+                "urlcompra": form.cleaned_data["urlcompra"],
+                "familiagrafica": form.cleaned_data["familiagrafica"],
+                "potenciacalculo": form.cleaned_data["potenciacalculo"],
+                "memoriavram": form.cleaned_data["memoriavram"],
+                "trazadorayos": form.cleaned_data["trazadorayos"],
+                "grafica_procesadores": form.cleaned_data["grafica_procesadores"],  # Procesador asociado
+                "user": request.user.id if request.user.is_authenticated else None
+            }
+
+            response = requests.put(
+                f"http://127.0.0.1:8000/template-api/graficas/{grafica_id}/",
+                json=datos,
+                headers=headers
+            )
+
+            if response.status_code == 200:
+                messages.success(request, "✅ Gráfica actualizada correctamente.")
+                return redirect("graficas_lista_api")  # Redirigir tras actualizar
+            else:
+                form.add_error(None, f"❌ Error en API: {response.text}")
+
+    else:
+        form = GraficaForm(initial=grafica_data)  # Prellenar formulario con los datos actuales
+
+    return render(request, "graficas/actualizar.html", {"formulario": form})
+
+
+def actualizar_nombre_grafica_cliente(request, grafica_id):
+    """ Vista cliente para actualizar solo el nombre de la gráfica """
+
+    if request.method == "POST":
+        form = ActualizarNombreGraficaForm(request.POST)
+
+        if form.is_valid():
+            nuevo_nombre = form.cleaned_data["nombre"]
+            resultado = helper.actualizar_nombre_grafica(grafica_id, nuevo_nombre)
+
+            if resultado:
+                messages.success(request, "✅ Nombre de la gráfica actualizado correctamente.")
+                return redirect("graficas_lista_api")  # Redirigir tras actualizar
+            else:
+                form.add_error(None, "❌ Error al actualizar el nombre de la gráfica.")
+
+    else:
+        form = ActualizarNombreGraficaForm()
+
+    return render(request, "graficas/actualizar_nombre.html", {"formulario": form})
+
+
+def eliminar_grafica(request, grafica_id):
+    """ Elimina una gráfica a través de la API """
+    resultado = helper.eliminar_grafica(grafica_id)
+
+    if resultado is not None:
+        messages.success(request, "✅ La gráfica se eliminó correctamente.")
+    else:
+        messages.error(request, "❌ No se pudo eliminar la gráfica.")
+
+    return redirect("graficas_lista_api")  # Redirige a la lista de gráficas después de eliminar
+#==========================================================================================================================
+
+# 📌 CREAR RELACIÓN Monitor-Grafica (POST)
+def crear_monitor_grafica_cliente(request):
+    if request.method == "POST":
+        form = MonitorGraficaForm(request.POST)
+
+        if form.is_valid():
+            data = {
+                "monitor": form.cleaned_data["monitor"],
+                "grafica": form.cleaned_data["grafica"],
+                "modo_conexion": form.cleaned_data["modo_conexion"],
+                "es_monitor_gaming": form.cleaned_data["es_monitor_gaming"],
+                "resolucion_maxima": form.cleaned_data["resolucion_maxima"]
+            }
+
+            response = helper.api_request("post", "crear/", data, tipo="monitores-graficas")
+
+            if response:
+                messages.success(request, "✅ ¡Relación Monitor-Grafica creada con éxito!")
+                return redirect("graficas_lista_api")
+            else:
+                messages.error(request, "❌ Error al crear la relación Monitor-Grafica.")
+
+    else:
+        form = MonitorGraficaForm()
+
+    return render(request, "monitores-graficas/crear.html", {"formulario": form})
+
+
+# 📌 ACTUALIZAR RELACIÓN Monitor-Grafica (PUT)
+def actualizar_monitor_grafica_cliente(request, relacion_id):
+    relacion = helper.api_request("get", f"{relacion_id}/", tipo="monitores-graficas")  # 🔥 FIX
+
+    if not relacion:
+        messages.error(request, "❌ No se encontró la relación Monitor-Grafica.")
+        return redirect("graficas_lista_api")
+
+    if request.method == "POST":
+        form = MonitorGraficaForm(request.POST)
+
+        if form.is_valid():
+            data = {
+                "monitor": form.cleaned_data["monitor"],
+                "grafica": form.cleaned_data["grafica"],
+                "modo_conexion": form.cleaned_data["modo_conexion"],
+            }
+
+            response = helper.api_request("put", f"{relacion_id}/", data, tipo="monitores-graficas")  # 🔥 FIX
+
+            if response:
+                messages.success(request, "✅ ¡Relación Monitor-Grafica actualizada con éxito!")
+                return redirect("graficas_lista_api")
+            else:
+                messages.error(request, "❌ Error al actualizar la relación Monitor-Grafica.")
+
+    else:
+        form = MonitorGraficaForm(initial=relacion)
+
+    return render(request, "monitores-graficas/actualizar.html", {"formulario": form})
+
+
+# 📌 ACTUALIZAR SOLO LA GRÁFICA EN LA RELACIÓN (PATCH)
+def actualizar_grafica_en_relacion_cliente(request, relacion_id):
+    """ Vista para actualizar solo la gráfica en una relación Monitor-Grafica """
+    
+    relacion = helper.api_request("get", f"{relacion_id}/", tipo="monitores-graficas")
+
+    if not relacion:
+        messages.error(request, "❌ No se encontró la relación Monitor-Grafica.")
+        return redirect("graficas_lista_api")
+
+    if request.method == "POST":
+        nueva_grafica = request.POST.get("grafica")
+
+        if not nueva_grafica:
+            messages.error(request, "❌ Debes seleccionar una gráfica.")
+        else:
+            response = helper.api_request("patch", f"{relacion_id}/actualizar-grafica/", 
+                                          data={"grafica": nueva_grafica}, tipo="monitores-graficas")
+            
+            if response:
+                messages.success(request, "✅ ¡Gráfica actualizada correctamente en la relación!")
+                return redirect("graficas_lista_api")
+            else:
+                messages.error(request, "❌ Error al actualizar la gráfica en la relación.")
+
+    return render(request, "monitores-graficas/actualizar-grafica.html", {"relacion": relacion})
+
+
+# 📌 ELIMINAR RELACIÓN Monitor-Grafica (DELETE)
+def eliminar_monitor_grafica_cliente(request, relacion_id):
+    response = helper.api_request("delete", f"{relacion_id}/", tipo="monitores-graficas")  # 🔥 FIX
+
+    if response:
+        messages.success(request, "✅ ¡Relación Monitor-Grafica eliminada correctamente!")
+    else:
+        messages.error(request, "❌ Error al eliminar la relación Monitor-Grafica.")
+
+    return redirect("graficas_lista_api")
+
+
+#=============================================================================================================
+
+
+ #Viewsets
+
+        
 # def libro_busqueda_simple(request):
 #     formulario = BusquedaLibroForm(request.GET)
     
