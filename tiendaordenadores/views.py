@@ -706,7 +706,27 @@ def eliminar_monitor_grafica_cliente(request, relacion_id):
 
 #=============================================================================================================
 
-
+def registrar_usuario(request):
+    if (request.method =="POST"):
+        try:
+            formulario = RegistroForm(request.POST)
+            if (formulario.is_valid()):
+                headers = {
+                    "Content-Type": "application/json"
+                }
+                response = requests.post(
+                    'http://127.0.0.1:8000/template-api/registrar'
+                    headers=headers,
+                    data = json.dumps(formulario.cleaned_data)
+                )
+                
+                if (response.status_code == requests.codes.ok):
+                    return redirect("index")
+                else:
+                    print(response.status_code)
+                    response.raise_for_status()
+        except HTTPError as http_err:
+            print(f'Hubo un error en l')
  #Viewsets
 
         

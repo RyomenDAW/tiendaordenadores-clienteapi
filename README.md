@@ -311,3 +311,124 @@ def grafica_busqueda_avanzada(request):
 
 El tutorial de POSTMAN en google docs
     
+
+PARTE 3:
+
+Incluir mensajes en la aplicación de cliente, para indicar que se ha realizado cada operación correctamente (1 punto)
+
+Message success que puse en base_simple y tambien en los htmls distintos que no heredaban de eso, si, se que puedo hacer que hereden todos de base
+simple y ya, pero es lo mismo a final de cuentas.
+
+
+Explico el apartado:
+
+Controlar correctamente los errores tanto en cliente como en la API, para que aparezca por consola siempre el error que se produce, pero por la aplicación te rediriga a las páginas de errores correspondiente(1 punto)
+
+
+🔹 1. Registro de errores en consola (Debugging)
+📌 Cada vez que ocurre un error en la API, lo imprimimos en consola con print()
+Ejemplos en el código:
+
+python
+Copy
+Edit
+print(f'Hubo un error en la petición: {http_err}')
+print(f'❌ Error de conexión: {req_err}')
+print(f'Ocurrió un error inesperado: {err}')
+print("📡 Enviando datos actualizados:", datos)
+print("🔎 API Response:", response.status_code, response.text)
+✔️ Esto nos ayuda a ver qué pasó cuando debugueamos en la terminal.
+
+🔹 2. Redirección a páginas de error en cliente
+📌 Ya tenemos un error.html en cada CRUD
+📌 Además, tenemos nuestras funciones de manejo de errores globales en views.py:
+
+python
+Copy
+Edit
+def mi_error_404(request, exception=None):
+    return render(request, 'errores/404.html', None, None, 404)
+
+def mi_error_400(request, exception=None):
+    return render(request, 'errores/400.html', None, None, 400)
+
+def mi_error_403(request, exception=None):
+    return render(request, 'errores/403.html', None, None, 403)
+
+def mi_error_500(request, exception=None):
+    return render(request, 'errores/500.html', None, None, 500)
+✔️ Esto garantiza que el usuario siempre vea una página de error amigable y no un error en crudo.
+
+🔹 3. Manejo de errores en las solicitudes a la API
+📌 La función manejar_errores() ya cubre errores en las peticiones
+
+python
+Copy
+Edit
+def manejar_errores(request, response, formulario, template):
+    try:
+        response.raise_for_status()
+    except HTTPError as http_err:
+        print(f'Hubo un error en la petición: {http_err}')
+        if response.status_code == 400:
+            errores = response.json()
+            for error in errores:
+                formulario.add_error(error, errores[error])
+            return render(request, template, {"formulario": formulario, "errores": errores})
+        else:
+            return mi_error_500(request)
+    except RequestException as req_err:
+        print(f'Error de conexión: {req_err}')
+        return mi_error_500(request)
+    except Exception as err:
+        print(f'Ocurrió un error inesperado: {err}')
+        return mi_error_500(request)
+✔️ Maneja los errores de conexión, HTTP y excepciones generales.
+✔️ Si la API devuelve un error, se muestra en la terminal y se redirige a una página de error.
+
+🔹 4. Integración de mensajes en la interfaz (Cliente)
+📌 Los errores en los formularios aparecen en pantalla usando messages.error()
+📌 Ejemplo en CRUD:
+
+python
+Copy
+Edit
+messages.error(request, "❌ Error al eliminar la gráfica.")
+✔️ Así, el usuario sabe qué pasó sin ver un error técnico.
+✔️ También se usan form.add_error() para marcar errores específicos.
+
+
+
+
+apartado
+
+Refactorizar el código, para que sólo se controle errores, se hagan las 
+peticiones y se gestionen las respuesta desde la clase helper(1 punto)
+
+errores desde aqui:
+
+try:
+    response = requests.request(method, url, headers=headers, json=data)
+    print(f"🔎 Respuesta {response.status_code}: {response.text}")
+
+    if response.status_code in [200, 201]:
+        return response.json()
+    elif response.status_code == 404:
+        print(f"🚨 ERROR 404: No se encontró el endpoint {url}.")
+except requests.RequestException as e:
+    print(f"❌ ERROR en la solicitud: {str(e)}")
+
+las peticiones he querido dividir por cada crud, si, es una locura a nivel mistico, pero en realidad le he visto mas sentido, api_url de procesadores, o de graficas o de monitor_graficas.
+
+y en funcion de eso, se elije un tipo en cada response, el cual se especifica.
+
+si, hay mas maneras, pero esta la veo muy organizada para no tener que cambiar una unica variable, si no mas bien una unidad de un crud entera, acepto criticas.
+
+En resumen:
+
+Las vistas (views.py) ahora solo llaman a helper, sin repetir código innecesario.
+Los errores se controlan en helper, evitando duplicación.
+Las respuestas de la API se gestionan en helper, mejorando la organización.
+
+la creme de la creme chiquillo
+
