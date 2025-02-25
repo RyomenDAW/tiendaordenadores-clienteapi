@@ -329,6 +329,14 @@ class MonitorGraficaForm(forms.Form):
 
         return cleaned_data
 
+class RegistroForm(UserCreationForm):
+    roles=(
+        (2,'Cliente'),
+        (3,'TecnicoInformatico'),
+        (4,'Vendedor'),
+    )
+    
+    
 
     # class Procesador (models.Model):
     # id_procesador = models.AutoField(primary_key=True)
