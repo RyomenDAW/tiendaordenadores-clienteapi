@@ -18,30 +18,45 @@
     <title>Página de Inicio</title>
 </head>
 <body>
-    <h1 class="bienvenida">Bienvenido a Cool Components!!</h1>
+    <h1 class="bienvenida text-center mt-3">Bienvenido a la API CLIENTE de CoolComponents!</h1>
 
-    {%block cabecera%}
+    {% block cabecera %}
     {% endblock %}
 
     {% include './nav.html' %}
-    {%block contenido%}
 
+    <div class="container mt-4">
+        <div class="d-flex justify-content-center align-items-center flex-column">
+            {% if request.session.token %}
+                <div class="alert alert-success text-center w-50">
+                    <h4 class="mb-2">Bienvenido, <strong>{{ request.session.usuario.username }}</strong></h4>
+                    <p class="mb-1"><strong>Email:</strong> {{ request.session.usuario.email }}</p>
+                    <p class="mb-2"><strong>Rol:</strong> 
+                        {% if request.session.usuario.rol == 2 %}
+                            Cliente
+                        {% elif request.session.usuario.rol == 3 %}
+                            Técnico Informático
+                        {% elif request.session.usuario.rol == 4 %}
+                            Vendedor
+                        {% else %}
+                            Usuario Desconocido
+                        {% endif %}
+                    </p>
+                    <a href="{% url 'logout' %}" class="btn btn-danger">Cerrar sesión</a>
+                </div>
+            {% else %}
+                <div class="text-center">
+                    <a href="{% url 'login' %}" class="btn btn-primary">Iniciar sesión</a>
+                    <a href="{% url 'api_registrar_usuario' %}" class="btn btn-secondary">Registrarse</a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    {% block contenido %}
     {% endblock %}
-</div>
 
     {% include './footer.html' %}
 
-
 </body>
 </html>
-
-{% comment %} CUARTO TEMPLATE TAG:, BLOCK Y ENDBLOCK
-Es blocky endblock
-
-{%block contenido%}
-{% endblock %} {% endcomment %}
-
-{% comment %} TERCER TEMPLATE TAG, INCLUDE
-{% include './footer.html' %}
-
-Es include {% endcomment %}

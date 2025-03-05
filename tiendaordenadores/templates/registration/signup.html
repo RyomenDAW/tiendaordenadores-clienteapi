@@ -3,7 +3,7 @@
 {% load django_bootstrap5 %}  <!-- Asegúrate de que esta línea esté incluida -->
 
 {% block contenido %}
-<form action="{% url 'registrar_usuario' %}" method="post">
+<form action="{% url 'api_registrar_usuario' %}" method="post">
     {% csrf_token %}
     
     {% bootstrap_field formulario.username %}

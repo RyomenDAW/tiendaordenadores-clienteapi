@@ -152,3 +152,26 @@ class helper:
     def eliminar_monitor_grafica(relacion_id):
         """ Elimina una relación Monitor-Grafica """
         return helper.api_request("delete", f"{relacion_id}/eliminar/", tipo="monitores-graficas")
+
+
+import requests
+
+API_TOKEN_URL = "http://127.0.0.1:8000/oauth2/token/"
+
+def obtener_token_session(username, password):
+    """Obtiene el token de acceso desde la API REST usando OAuth2"""
+    data = {
+        'grant_type': 'password',
+        'username': username,
+        'password': password,
+        'client_id': 'tiendaordenadores',  # Sustituir con el ID si cambia
+        'client_secret': 'tiendaordenadores'  # Sustituir con el Secret real
+    }
+
+    response = requests.post(API_TOKEN_URL, data=data)
+    respuesta = response.json()
+
+    if response.status_code == 200:
+        return respuesta.get('access_token')
+    else:
+        raise Exception(respuesta.get("error_description", "Error al obtener el token"))

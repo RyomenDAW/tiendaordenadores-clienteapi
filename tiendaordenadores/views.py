@@ -715,9 +715,9 @@ def registrar_usuario(request):
                     "Content-Type": "application/json"
                 }
                 response = requests.post(
-                    'http://127.0.0.1:8000/template-api/registrar'
+                    'http://127.0.0.1:8000/template-api/registrar',
                     headers=headers,
-                    data = json.dumps(formulario.cleaned_data)
+                    data=json.dumps(formulario.cleaned_data)
                 )
                 
                 if (response.status_code == requests.codes.ok):
@@ -726,10 +726,110 @@ def registrar_usuario(request):
                     print(response.status_code)
                     response.raise_for_status()
         except HTTPError as http_err:
-            print(f'Hubo un error en l')
- #Viewsets
+            print(f'Hubo un error en la peticion: {http_err}')
+            if (response.status_code == 400):
+                errores = response.json
+                for error in errores:
+                    formulario.add_error(error, errores[error])
+                return render(request, 'registration/signup.html'
+                              ,{"formulario":formulario})
+            else:
+                return mi_error_500(request)
+        except Exception as err:
+            print(f'Ocurrio un error: {err}')
+            return mi_error_500(request)
+    else:
+        formulario = RegistroForm()
+    return render(request, 'registration/signup.html', {'formulario': formulario})
 
-        
+
+
+from django.shortcuts import render, redirect
+import requests
+from .forms import RegistroForm, LoginForm
+from django.contrib.auth import logout
+
+API_URL = "http://127.0.0.1:8000/template-api/"
+
+def api_registrar_usuario(request):
+    if request.method == "POST":
+        formulario = RegistroForm(request.POST)
+        if formulario.is_valid():
+            data = {
+                'username': formulario.cleaned_data['username'],
+                'email': formulario.cleaned_data['email'],
+                'password1': formulario.cleaned_data['password1'],
+                'password2': formulario.cleaned_data['password2'],
+                'first_name': formulario.cleaned_data.get('first_name', ''),
+                'last_name': formulario.cleaned_data.get('last_name', ''),
+                'rol': formulario.cleaned_data.get('rol', ''),
+            }
+            response = requests.post(f"{API_URL}register/", json=data)
+            
+            print(f"Enviando datos a API: {data}")  # ✅ Esto mostrará en consola lo que se está enviando
+            print(f"Respuesta del servidor: {response.status_code} - {response.text}")  # ✅ Para ver la respuesta exacta
+            
+            if response.status_code == 201:
+                return redirect("login")
+            else:
+                formulario.add_error(None, "Error en el registro. Verifica los datos.")
+        else:
+            print("Errores en formulario:", formulario.errors)  # ✅ Para ver qué datos no están bien
+
+    else:
+        formulario = RegistroForm()
+    
+    return render(request, "registration/signup.html", {"formulario": formulario})
+
+
+
+API_USER_URL = "http://127.0.0.1:8000/template-api/usuario/token/"  # Ajusta la URL real
+from django.shortcuts import render, redirect
+from .forms import LoginForm
+from .helper import obtener_token_session  # Asegura que esta línea está presente
+
+def login(request):
+    if request.method == "POST":
+        formulario = LoginForm(request.POST)
+        if formulario.is_valid():
+            try:
+                # Obtener token de la API REST
+                token_acceso = obtener_token_session(
+                    formulario.cleaned_data.get("username"),
+                    formulario.cleaned_data.get("password")
+                )
+                
+                # Guardamos el token en la sesión
+                request.session["token"] = token_acceso
+                
+                # Usamos el token para obtener los datos del usuario
+                headers = {'Authorization': f'Bearer {token_acceso}'}
+                response = requests.get(API_USER_URL, headers=headers)
+                usuario = response.json()
+                
+                # Guardamos los datos del usuario en la sesión
+                request.session["usuario"] = usuario
+                
+                return redirect("inicio")  # Redirigir a la página de inicio
+
+            except Exception as excepcion:
+                formulario.add_error("username", excepcion)
+                formulario.add_error("password", excepcion)
+
+    else:
+        formulario = LoginForm()
+
+    return render(request, "registration/login.html", {"form": formulario})
+
+
+def logout(request):
+    """Cierra sesión eliminando el token de la sesión"""
+    if "token" in request.session:
+        del request.session["token"]
+    if "usuario" in request.session:
+        del request.session["usuario"]
+    return redirect("inicio")
+
 # def libro_busqueda_simple(request):
 #     formulario = BusquedaLibroForm(request.GET)
     

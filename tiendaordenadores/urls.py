@@ -53,9 +53,15 @@ urlpatterns = [
 
     
     #=======================================================================================================================================================
-    path('registrar',views.registrar_usuario, name='registrar_usuario'),
-    path('login', views.login, name='login'),
-    path('logout', views.logout, name='logout')
+    
+    path("registrar/", api_registrar_usuario, name="api_registrar_usuario"),
+    path("login/", login, name="login"),
+    path("logout/", logout, name="logout"),
+    # path('login',views.api_login,name='api_login'),
+    # path('logout',views.api_logout,name='api_logout'),
+    
+    # path('login', views.login, name='login'),
+    # path('logout', views.logout, name='logout')
     
     # path('registrar',views.registrar_usuario, name='registrar_usuario'),
     # path('logout/', LogoutView.as_view(), name='logout'),  # Ruta para el logout
